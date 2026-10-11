@@ -1,0 +1,28 @@
+{
+  "name": "Ошибка 1006: город не найден (любой q, кроме известных заглушке)",
+  "priority": 10,
+  "request": {
+    "method": "GET",
+    "urlPath": "/v1/current.json",
+    "queryParameters": {
+      "key": {
+        "equalTo": "test-api-key"
+      },
+      "q": {
+        "matches": ".+"
+      }
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": {
+        "code": 1006,
+        "message": "No matching location found."
+      }
+    }
+  }
+}

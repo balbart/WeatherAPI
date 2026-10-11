@@ -1,0 +1,25 @@
+{
+  "name": "Ошибка 1002: ключ не передан",
+  "priority": 2,
+  "request": {
+    "method": "GET",
+    "urlPath": "/v1/current.json",
+    "queryParameters": {
+      "key": {
+        "absent": true
+      }
+    }
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": {
+        "code": 1002,
+        "message": "API key is invalid or not provided."
+      }
+    }
+  }
+}

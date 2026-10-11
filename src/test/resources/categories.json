@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Расхождения с ожидаемой погодой",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*Найдены расхождения.*"
+  },
+  {
+    "name": "Неожиданная ошибка API",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*(статус|код ошибки|сообщение).*"
+  },
+  {
+    "name": "Сломанные тесты",
+    "matchedStatuses": ["broken"]
+  }
+]

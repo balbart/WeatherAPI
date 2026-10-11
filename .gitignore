@@ -1,0 +1,9 @@
+.gradle/
+build/
+out/
+.idea/
+*.iml
+.DS_Store
+allure-results/
+allure-report/
+local.properties

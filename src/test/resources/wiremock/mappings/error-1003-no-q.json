@@ -1,0 +1,28 @@
+{
+  "name": "Ошибка 1003: параметр q не передан",
+  "priority": 3,
+  "request": {
+    "method": "GET",
+    "urlPath": "/v1/current.json",
+    "queryParameters": {
+      "key": {
+        "equalTo": "test-api-key"
+      },
+      "q": {
+        "absent": true
+      }
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": {
+        "code": 1003,
+        "message": "Parameter q is missing."
+      }
+    }
+  }
+}

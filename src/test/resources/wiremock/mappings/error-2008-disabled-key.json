@@ -1,0 +1,25 @@
+{
+  "name": "Ошибка 2008: ключ отключён",
+  "priority": 2,
+  "request": {
+    "method": "GET",
+    "urlPath": "/v1/current.json",
+    "queryParameters": {
+      "key": {
+        "equalTo": "disabled-key"
+      }
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": {
+        "code": 2008,
+        "message": "API key has been disabled."
+      }
+    }
+  }
+}

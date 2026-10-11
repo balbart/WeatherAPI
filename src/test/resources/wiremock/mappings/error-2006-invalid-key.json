@@ -1,0 +1,25 @@
+{
+  "name": "Ошибка 2006: неверный ключ (приоритет ниже 1002: doesNotMatch срабатывает и на отсутствующий key)",
+  "priority": 4,
+  "request": {
+    "method": "GET",
+    "urlPath": "/v1/current.json",
+    "queryParameters": {
+      "key": {
+        "doesNotMatch": "^(test-api-key|disabled-key)$"
+      }
+    }
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": {
+        "code": 2006,
+        "message": "API key is invalid."
+      }
+    }
+  }
+}
