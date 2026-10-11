@@ -1,0 +1,197 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Current weather response (GET /v1/current.json)",
+  "description": "Контракт ответа текущей погоды по документации weatherapi.com. Дополнительные поля разрешены: API может их добавлять.",
+  "type": "object",
+  "required": [
+    "location",
+    "current"
+  ],
+  "properties": {
+    "location": {
+      "type": "object",
+      "required": [
+        "name",
+        "region",
+        "country",
+        "lat",
+        "lon",
+        "tz_id",
+        "localtime_epoch",
+        "localtime"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "region": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "lon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "tz_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "localtime_epoch": {
+          "type": "integer"
+        },
+        "localtime": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{1,2}:\\d{2}$"
+        }
+      }
+    },
+    "current": {
+      "type": "object",
+      "required": [
+        "last_updated_epoch",
+        "last_updated",
+        "temp_c",
+        "temp_f",
+        "is_day",
+        "condition",
+        "wind_mph",
+        "wind_kph",
+        "wind_degree",
+        "wind_dir",
+        "pressure_mb",
+        "pressure_in",
+        "precip_mm",
+        "precip_in",
+        "humidity",
+        "cloud",
+        "feelslike_c",
+        "feelslike_f",
+        "vis_km",
+        "vis_miles",
+        "uv",
+        "gust_mph",
+        "gust_kph"
+      ],
+      "properties": {
+        "last_updated_epoch": {
+          "type": "integer"
+        },
+        "last_updated": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{1,2}:\\d{2}$"
+        },
+        "temp_c": {
+          "type": "number"
+        },
+        "temp_f": {
+          "type": "number"
+        },
+        "is_day": {
+          "type": "integer",
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "condition": {
+          "type": "object",
+          "required": [
+            "text",
+            "icon",
+            "code"
+          ],
+          "properties": {
+            "text": {
+              "type": "string",
+              "minLength": 1
+            },
+            "icon": {
+              "type": "string",
+              "minLength": 1
+            },
+            "code": {
+              "type": "integer"
+            }
+          }
+        },
+        "wind_mph": {
+          "type": "number",
+          "minimum": 0
+        },
+        "wind_kph": {
+          "type": "number",
+          "minimum": 0
+        },
+        "wind_degree": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 360
+        },
+        "wind_dir": {
+          "type": "string",
+          "pattern": "^[NSEW]{1,3}$"
+        },
+        "pressure_mb": {
+          "type": "number"
+        },
+        "pressure_in": {
+          "type": "number"
+        },
+        "precip_mm": {
+          "type": "number",
+          "minimum": 0
+        },
+        "precip_in": {
+          "type": "number",
+          "minimum": 0
+        },
+        "humidity": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "cloud": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "feelslike_c": {
+          "type": "number"
+        },
+        "feelslike_f": {
+          "type": "number"
+        },
+        "vis_km": {
+          "type": "number",
+          "minimum": 0
+        },
+        "vis_miles": {
+          "type": "number",
+          "minimum": 0
+        },
+        "uv": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gust_mph": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gust_kph": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

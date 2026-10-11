@@ -20,10 +20,18 @@ import ru.test.weather.model.CurrentWeatherResponse;
 import ru.test.weather.model.ErrorResponse;
 import ru.test.weather.stubs.WeatherApiStub;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -75,15 +83,61 @@ public class WeatherSteps {
                 .isEqualTo(expectedStatus);
     }
 
+    @Then("ответ соответствует JSON-схеме {string}")
+    public void checkJsonSchema(String schemaFile) {
+        String schemaPath = "schemas/" + schemaFile;
+        Allure.addAttachment("JSON-схема: " + schemaFile, "application/json", readResource(schemaPath), ".json");
+        response.then().assertThat().body(matchesJsonSchemaInClasspath(schemaPath));
+        log.info("Ответ соответствует схеме {}", schemaFile);
+    }
+
     @Then("фактическая погода совпадает с ожидаемой:")
     public void compareWithExpected(DataTable table) {
+        List<FieldComparison> comparisons = compareAndReport(table);
+        List<FieldComparison> mismatches = mismatchesOf(comparisons);
+
+        if (!mismatches.isEmpty()) {
+            String details = mismatches.stream().map(FieldComparison::toString)
+                    .collect(Collectors.joining(System.lineSeparator() + "  - ", "  - ", ""));
+            fail("Найдены расхождения для '%s' (%d из %d):%n%s"
+                    .formatted(query, mismatches.size(), comparisons.size(), details));
+        }
+    }
+
+    /**
+     * Шаг для демонстрационного сценария: ожидания в таблице заведомо неверные,
+     * расхождения так же выводятся в лог и в Allure, но сценарий проверяет, что найдены
+     * именно перечисленные расхождения, и поэтому не падает.
+     */
+    @Then("при сравнении с ожидаемой погодой найдены расхождения в полях {string}:")
+    public void compareWithExpectedMismatches(String expectedMismatchFields, DataTable table) {
+        List<FieldComparison> comparisons = compareAndReport(table);
+
+        Set<String> expectedFields = Arrays.stream(expectedMismatchFields.split(","))
+                .map(String::trim)
+                .filter(field -> !field.isEmpty())
+                .collect(Collectors.toCollection(TreeSet::new));
+        Set<String> actualFields = mismatchesOf(comparisons).stream()
+                .map(FieldComparison::field)
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        assertThat(actualFields)
+                .as("Поля, по которым найдены расхождения")
+                .isEqualTo(expectedFields);
+        log.info("Найдены ожидаемые расхождения по полям {}: сравнение работает корректно", actualFields);
+    }
+
+    /**
+     * Сравнивает ответ с таблицей ожиданий и выводит результат по каждому значению:
+     * в лог (OK — INFO, расхождение — WARN), отдельным шагом в Allure и CSV-вложением.
+     */
+    private List<FieldComparison> compareAndReport(DataTable table) {
         Map<String, String> expected = table.asMap(String.class, String.class);
         CurrentWeatherResponse actual = parse(CurrentWeatherResponse.class);
 
         List<FieldComparison> comparisons = comparator.compare(actual, expected);
-        List<FieldComparison> mismatches = comparisons.stream().filter(c -> !c.matches()).toList();
+        List<FieldComparison> mismatches = mismatchesOf(comparisons);
 
-        // Каждое значение — в лог и отдельным шагом в Allure
         log.info("Сравнение погоды для '{}': полей {}, расхождений {}", query, comparisons.size(), mismatches.size());
         for (FieldComparison c : comparisons) {
             if (c.matches()) {
@@ -94,13 +148,11 @@ public class WeatherSteps {
             Allure.step(c.toString(), c.matches() ? Status.PASSED : Status.FAILED);
         }
         Allure.addAttachment("Сравнение: " + query, "text/csv", toCsv(comparisons), ".csv");
+        return comparisons;
+    }
 
-        if (!mismatches.isEmpty()) {
-            String details = mismatches.stream().map(FieldComparison::toString)
-                    .collect(Collectors.joining(System.lineSeparator() + "  - ", "  - ", ""));
-            fail("Найдены расхождения для '%s' (%d из %d):%n%s"
-                    .formatted(query, mismatches.size(), comparisons.size(), details));
-        }
+    private static List<FieldComparison> mismatchesOf(List<FieldComparison> comparisons) {
+        return comparisons.stream().filter(c -> !c.matches()).toList();
     }
 
     @Then("ответ содержит ошибку с кодом {int} и сообщением {string}")
@@ -146,6 +198,17 @@ public class WeatherSteps {
 
     private static String csvCell(String value) {
         return "\"" + value.replace("\"", "\"\"") + "\"";
+    }
+
+    private static String readResource(String path) {
+        try (InputStream in = WeatherSteps.class.getClassLoader().getResourceAsStream(path)) {
+            if (in == null) {
+                throw new IllegalStateException("Не найден ресурс в classpath: " + path);
+            }
+            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     private static String describe(String value) {

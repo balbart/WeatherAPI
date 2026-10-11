@@ -1,16 +1,25 @@
 [
   {
     "name": "Расхождения с ожидаемой погодой",
+    "description": "Фактические значения в ответе не совпали с ожидаемыми из feature-файла",
     "matchedStatuses": ["failed"],
     "messageRegex": ".*Найдены расхождения.*"
   },
   {
-    "name": "Неожиданная ошибка API",
+    "name": "Нарушение контракта (JSON-схема)",
+    "description": "Ответ не соответствует JSON-схеме из src/test/resources/schemas",
     "matchedStatuses": ["failed"],
-    "messageRegex": ".*(статус|код ошибки|сообщение).*"
+    "messageRegex": ".*(JSON schema|json-schema|schema).*"
+  },
+  {
+    "name": "Неожиданный ответ API",
+    "description": "Не тот HTTP-статус, код ошибки или сообщение",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*(HTTP-статус|код ошибки|сообщение).*"
   },
   {
     "name": "Сломанные тесты",
+    "description": "Исключение в коде тестов или окружении, а не в проверке",
     "matchedStatuses": ["broken"]
   }
 ]
